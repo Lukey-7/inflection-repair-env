@@ -1,0 +1,10 @@
+{
+  "name": "restore-irregular-plurals",
+  "target_groups": [
+    "plural_irregular"
+  ],
+  "reward_type": "partial",
+  "discriminative_only": true,
+  "n_random": 300,
+  "n_guard_random": 40
+}

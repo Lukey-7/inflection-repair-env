@@ -1,0 +1,10 @@
+{
+  "name": "fix-ordinal",
+  "target_groups": [
+    "ordinal"
+  ],
+  "reward_type": "binary",
+  "discriminative_only": false,
+  "n_random": 300,
+  "n_guard_random": 40
+}

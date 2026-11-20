@@ -1,0 +1,10 @@
+{
+  "name": "implement-parameterize",
+  "target_groups": [
+    "parameterize"
+  ],
+  "reward_type": "binary",
+  "discriminative_only": false,
+  "n_random": 300,
+  "n_guard_random": 40
+}
