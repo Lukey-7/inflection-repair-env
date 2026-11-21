@@ -244,6 +244,11 @@ def test_child_compound():
 TASK_TOML = """\
 version = "1.0"
 
+# Only the graded file leaves the agent's container. The verifier runs in a
+# fresh container built from the same image, so nothing else the agent did
+# (planted files, a patched interpreter, edited site-packages) reaches it.
+artifacts = ["/app/inflection/__init__.py"]
+
 [metadata]
 author_name = "{author}"
 difficulty = "{difficulty}"
@@ -252,6 +257,7 @@ tags = ["python", "bug-fix", "inflection"]
 
 [verifier]
 timeout_sec = 300.0
+environment_mode = "separate"
 
 [agent]
 timeout_sec = 900.0

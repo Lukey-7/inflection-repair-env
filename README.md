@@ -77,11 +77,21 @@ python tools/docker_check.py fix-ordinal --oracle      # expect REWARD=1.0000
 python tools/docker_check.py fix-ordinal --exploit e4  # expect REWARD=0.0000
 ```
 
-With [Harbor](https://github.com/laude-institute/harbor) installed:
+With [Harbor](https://github.com/laude-institute/harbor) installed
+(`uv tool install harbor`):
 
 ```bash
-harbor run -p tasks/fix-ordinal -a oracle
+harbor lint tasks/fix-ordinal
+harbor run -p tasks -a oracle     # all four tasks -> mean 1.000
+harbor run -p tasks -a nop        # agent that does nothing -> mean 0.000
 ```
+
+The tasks use Harbor's **separate verifier** mode. Only
+`/app/inflection/__init__.py` is copied, as an artefact, into a fresh
+container built from the pristine image, so nothing else the agent changed
+(planted files, a patched interpreter) reaches the grader.
+`tools/docker_check.py` is a lighter, shared-container check for quick local
+iteration.
 
 ## How the grader resists gaming
 
@@ -95,7 +105,9 @@ See the top of [`common/grade.py`](common/grade.py) and
   separate `python -I -S` interpreter;
 - compares results in a process that never imports agent code;
 - uses guard checks on every other function, so regressions score 0;
-- in Docker, runs agent code as `nobody`, with the tests directory unreadable.
+- in Docker, runs agent code as `nobody`, with the tests directory unreadable;
+- in Harbor, grades in a separate container that receives only the graded
+  file.
 
 ## Extending this to a real customer codebase (stretch note)
 

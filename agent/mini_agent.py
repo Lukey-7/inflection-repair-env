@@ -14,7 +14,7 @@ The model answers each turn with ONE JSON action:
 After "done" (or the step limit) the hidden grader scores the workspace.
 Transcripts go to runs/<task>-<timestamp>.jsonl. Standard library only.
 
-Status: written on the office PC without Ollama; first real run is at home.
+Tested with qwen2.5-coder:3b on CPU (see docs/RESULTS.md).
 """
 import argparse
 import json
@@ -44,7 +44,11 @@ Prefer "replace" for small edits."""
 def chat(model, messages, host):
     body = json.dumps({"model": model, "messages": messages, "stream": False,
                        "format": "json",
-                       "options": {"temperature": 0.2}}).encode()
+                       # Ollama defaults to a 4096-token context, smaller than
+                       # the library file itself; without this the model
+                       # silently sees a truncated file.
+                       "options": {"temperature": 0.2, "num_ctx": 16384}}
+                      ).encode()
     req = urllib.request.Request(host + "/api/chat", data=body,
                                  headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=600) as resp:
@@ -127,6 +131,7 @@ def main():
                 obs = "error: %s" % exc
             log.write(json.dumps({"step": step, "action": action,
                                   "observation": obs[:2000]}) + "\n")
+            log.flush()
             messages.append({"role": "user", "content": obs})
         result = envctl.grade(args.task, ws)
         log.write(json.dumps({"grade": result}) + "\n")
